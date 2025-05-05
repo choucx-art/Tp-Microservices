@@ -21,3 +21,6 @@ app.get('/data', async (req, res) => {
 app.listen(PORT, () => {
   console.log(`API Gateway running on port ${PORT}`);
 });
+
+const axiosRetry = require('axios-retry');
+axiosRetry(axios, { retries: 3 });
