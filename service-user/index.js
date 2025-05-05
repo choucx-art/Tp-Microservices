@@ -32,3 +32,5 @@ app.get('/metrics', async (req, res) => {
   res.end(await client.register.metrics());
 });
 
+const mongoose = require('mongoose');
+mongoose.connect('mongodb://mongodb-user:27017/users');
