@@ -1,1 +1,18 @@
+version: '3'
+services:
+  user:
+    build: ./service-user
+    ports:
+      - "3001:3000"
+  product:
+    build: ./service-product
+    ports:
+      - "3002:3000"
+  gateway:
+    build: ./api-gateway
+    ports:
+      - "3000:3000"
+    depends_on:
+      - user
+      - product
 
