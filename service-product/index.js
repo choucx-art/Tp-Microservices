@@ -1,14 +1,22 @@
 const express = require('express');
+const amqp = require('amqplib');
 const app = express();
 const PORT = 3000;
 
-app.get('/products', (req, res) => {
-  res.json([
-    { id: 1, name: 'Laptop' },
-    { id: 2, name: 'Phone' }
-  ]);
+async function connect() {
+  const connection = await amqp.connect('amqp://rabbitmq');
+  const channel = await connection.createChannel();
+  await channel.assertQueue('notifications');
+
+  channel.consume('notifications', msg => {
+    const user = JSON.parse(msg.content.toString());
+    console.log('🔔 Nouveau message reçu:', user);
+    channel.ack(msg);
+  });
+}
+
+app.listen(PORT, async () => {
+  console.log(`Service Product sur le port ${PORT}`);
+  await connect();
 });
 
-app.listen(PORT, () => {
-  console.log(`Product service running on port ${PORT}`);
-});
