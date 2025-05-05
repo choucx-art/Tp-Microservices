@@ -1,14 +1,25 @@
 const express = require('express');
+const amqp = require('amqplib');
 const app = express();
 const PORT = 3000;
 
-app.get('/users', (req, res) => {
-  res.json([
-    { id: 1, name: 'Alice' },
-    { id: 2, name: 'Bob' }
-  ]);
+let channel;
+
+async function connect() {
+  const connection = await amqp.connect('amqp://rabbitmq');
+  channel = await connection.createChannel();
+  await channel.assertQueue('notifications');
+}
+
+app.use(express.json());
+
+app.post('/users', async (req, res) => {
+  const user = { id: Date.now(), name: req.body.name };
+  channel.sendToQueue('notifications', Buffer.from(JSON.stringify(user)));
+  res.status(201).send(`Utilisateur ${user.name} créé`);
 });
 
-app.listen(PORT, () => {
-  console.log(`User service running on port ${PORT}`);
+app.listen(PORT, async () => {
+  console.log(`Service User sur le port ${PORT}`);
+  await connect();
 });
