@@ -1,11 +1,17 @@
 version: '3'
-services:
-  user:
+service-user:
     build: ./service-user
+    container_name: service-user
+    depends_on:
+      - rabbitmq
     ports:
       - "3001:3000"
-  product:
+
+  service-product:
     build: ./service-product
+    container_name: service-product
+    depends_on:
+      - rabbitmq
     ports:
       - "3002:3000"
   gateway:
@@ -15,8 +21,11 @@ services:
     depends_on:
       - user
       - product
-rabbitmq:
-  image: rabbitmq:3-management
-  ports:
-    - "15672:15672"   # interface web
-    - "5672:5672"     # port AMQP
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "15672:15672"   # interface web
+      - "5672:5672"     # port AMQP
+  environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
