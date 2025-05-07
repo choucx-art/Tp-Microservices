@@ -7,3 +7,61 @@ L’infrastructure est supervisée avec Prometheus (métriques), Grafana (visual
 Une chaîne CI/CD complète est mise en place avec GitHub Actions, permettant le linting, les tests, et le déploiement automatisé des images Docker vers Docker Hub. Chaque commit déclenche un pipeline de build/test, renforçant la fiabilité du code. Des tests unitaires et d’intégration assurent la robustesse de chaque composant. Des outils comme jest, mocha ou pytest peuvent être utilisés selon les langages choisis (Node.js, Python, etc.).
 
 L’objectif final de ce TP est d’acquérir des compétences complètes en architecture microservices, en DevOps, en supervision temps réel, et en bonnes pratiques professionnelles. Les étudiants apprendront à bâtir un système résilient, scalable, bien documenté, et conforme aux standards industriels modernes, le tout dans un environnement contrôlé et reproductible grâce à Docker et GitHub.
+
+microservices-tp/
+│
+├── .github/
+│   └── workflows/
+│       └── ci.yml                     # Workflow GitHub Actions : test, build, push Docker
+│
+├── docker-compose.yml                # Orchestration complète (services + observabilité)
+├── .env                              # Variables d’environnement globales
+│
+├── api-gateway/
+│   ├── Dockerfile
+│   ├── index.js
+│   ├── package.json
+│   ├── src/
+│   │   ├── routes.js
+│   │   └── authMiddleware.js         # JWT middleware
+│   └── swagger.json
+│
+├── service-user/
+│   ├── Dockerfile
+│   ├── package.json
+│   ├── index.js
+│   ├── src/
+│   │   ├── userController.js
+│   │   └── db.js                     # Connexion MongoDB/PostgreSQL
+│   ├── tests/
+│   │   └── user.test.js
+│   └── swagger.json
+│
+├── service-order/
+│   └── ... (même structure que service-user)
+├── service-payment/
+│   └── ... (même structure que service-user)
+├── service-notification/
+│   └── ... (même structure que service-user)
+│
+├── prometheus/
+│   └── prometheus.yml
+├── grafana/
+│   ├── dashboards/
+│   │   └── main-dashboard.json
+│   └── provisioning/
+│       └── datasources.yml
+│
+├── loki/
+│   └── loki-config.yml               # Centralisation des logs
+├── logs/
+│   └── promtail-config.yml          # Promtail pour envoyer les logs vers Loki
+│
+├── message-broker/
+│   └── docker-compose.rabbitmq.yml
+│
+├── db/
+│   ├── mongo/                        # Ou postgresql/
+│   │   └── docker-compose.db.yml
+│
+└── README.md                         # Documentation complète du projet
