@@ -8,6 +8,7 @@ Une chaîne CI/CD complète est mise en place avec GitHub Actions, permettant le
 
 L’objectif final de ce TP est d’acquérir des compétences complètes en architecture microservices, en DevOps, en supervision temps réel, et en bonnes pratiques professionnelles. Les étudiants apprendront à bâtir un système résilient, scalable, bien documenté, et conforme aux standards industriels modernes, le tout dans un environnement contrôlé et reproductible grâce à Docker et GitHub.
 
+
 microservices-tp/
 │
 ├── .github/
