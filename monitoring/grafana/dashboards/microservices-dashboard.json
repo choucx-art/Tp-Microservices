@@ -1,0 +1,53 @@
+{
+  "dashboard": {
+    "id": null,
+    "uid": "microservices-dashboard",
+    "title": "Microservices Monitoring",
+    "tags": [
+      "microservices",
+      "monitoring"
+    ],
+    "timezone": "browser",
+    "schemaVersion": 36,
+    "version": 1,
+    "panels": [
+      {
+        "type": "graph",
+        "title": "Requ\u00eates par service",
+        "datasource": "Prometheus",
+        "targets": [
+          {
+            "expr": "rate(http_requests_total[1m])",
+            "legendFormat": "{{job}}",
+            "interval": "",
+            "refId": "A"
+          }
+        ],
+        "gridPos": {
+          "x": 0,
+          "y": 0,
+          "w": 24,
+          "h": 8
+        }
+      },
+      {
+        "type": "logs",
+        "title": "Logs r\u00e9cents (Loki)",
+        "datasource": "Loki",
+        "targets": [
+          {
+            "expr": "{job=\"user-service\"}",
+            "refId": "B"
+          }
+        ],
+        "gridPos": {
+          "x": 0,
+          "y": 8,
+          "w": 24,
+          "h": 8
+        }
+      }
+    ]
+  },
+  "overwrite": true
+}
