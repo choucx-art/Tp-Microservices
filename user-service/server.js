@@ -1,20 +1,26 @@
 const express = require('express');
-const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
-const userRoutes = require('./src/routes/userRoutes');
 
 dotenv.config();
-const app = express();
 
-app.use(bodyParser.json());
+const userRoutes = require('./src/routes/userRoutes');
+
+const app = express();
+app.use(express.json());
+
 app.use('/users', userRoutes);
 
-mongoose.connect(process.env.MONGO_URL)
-  .then(() => {
-    console.log("MongoDB connected for User Service");
-    app.listen(process.env.PORT, () => {
-      console.log(`User service running on port ${process.env.PORT}`);
-    });
-  })
-  .catch(err => console.error(err));
+const PORT = process.env.USER_SERVICE_PORT || 3001;
+
+mongoose.connect(process.env.MONGO_URI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true
+}).then(() => {
+  console.log('User service connected to MongoDB');
+  app.listen(PORT, () => {
+    console.log(`User service running on port ${PORT}`);
+  });
+}).catch(err => {
+  console.error('MongoDB connection error:', err);
+});
