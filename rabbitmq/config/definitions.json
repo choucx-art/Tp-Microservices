@@ -1,26 +1,15 @@
 {
-  "users": [
-    {
-      "name": "admin",
-      "password": "admin",
-      "tags": "administrator"
-    }
-  ],
   "vhosts": [
     {
       "name": "/"
     }
   ],
-  "permissions": [
-    {
-      "user": "admin",
-      "vhost": "/",
-      "configure": ".*",
-      "write": ".*",
-      "read": ".*"
-    }
-  ],
   "queues": [
+    {
+      "name": "payments",
+      "vhost": "/",
+      "durable": true
+    },
     {
       "name": "notifications",
       "vhost": "/",
@@ -29,7 +18,7 @@
   ],
   "exchanges": [
     {
-      "name": "amq.direct",
+      "name": "microservice-exchange",
       "vhost": "/",
       "type": "direct",
       "durable": true
@@ -37,12 +26,18 @@
   ],
   "bindings": [
     {
-      "source": "amq.direct",
+      "source": "microservice-exchange",
+      "vhost": "/",
+      "destination": "payments",
+      "destination_type": "queue",
+      "routing_key": "payment.created"
+    },
+    {
+      "source": "microservice-exchange",
       "vhost": "/",
       "destination": "notifications",
       "destination_type": "queue",
-      "routing_key": "notify",
-      "arguments": {}
+      "routing_key": "notification.send"
     }
   ]
 }
