@@ -1,35 +1,41 @@
 const express = require('express');
 const { createProxyMiddleware } = require('http-proxy-middleware');
+const YAML = require('yamljs');
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.GATEWAY_PORT || 3000;
 
-// Middleware d'authentification
-function authenticateToken(req, res, next) {
-  const authHeader = req.headers['authorization'];
-  const token = authHeader && authHeader.split(' ')[1];
-  if (!token) return res.sendStatus(401);
+// Load route configuration
+const routes = YAML.load('./routes.yaml');
 
-  jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
-    if (err) return res.sendStatus(403);
-    req.user = user;
+// JWT middleware
+app.use((req, res, next) => {
+  if (routes.protected.includes(req.path)) {
+    const authHeader = req.headers.authorization;
+    if (!authHeader) return res.status(401).send('Token required');
+
+    const token = authHeader.split(' ')[1];
+    jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
+      if (err) return res.status(403).send('Invalid token');
+      req.user = user;
+      next();
+    });
+  } else {
     next();
-  });
-}
+  }
+});
 
-// Routage vers les microservices
-app.use('/users', authenticateToken, createProxyMiddleware({ target: process.env.USER_SERVICE_URL, changeOrigin: true }));
-app.use('/orders', authenticateToken, createProxyMiddleware({ target: process.env.ORDER_SERVICE_URL, changeOrigin: true }));
-app.use('/payments', authenticateToken, createProxyMiddleware({ target: process.env.PAYMENT_SERVICE_URL, changeOrigin: true }));
-app.use('/notifications', authenticateToken, createProxyMiddleware({ target: process.env.NOTIFICATION_SERVICE_URL, changeOrigin: true }));
-
-// Point public pour tester l'API Gateway
-app.get('/', (req, res) => {
-  res.send('API Gateway is running');
+// Apply proxy for each route
+routes.services.forEach(service => {
+  app.use(service.route, createProxyMiddleware({
+    target: service.target,
+    changeOrigin: true,
+    pathRewrite: (path, req) => path.replace(service.route, '')
+  }));
 });
 
 app.listen(PORT, () => {
-  console.log(`API Gateway running at http://localhost:${PORT}`);
+  console.log(`API Gateway listening on port ${PORT}`);
 });
