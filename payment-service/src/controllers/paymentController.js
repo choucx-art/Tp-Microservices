@@ -1,24 +1,23 @@
-const Payment = require('../models/Payment');
+const Payment = require('../models/paymentModel');
+// const sendToQueue = require('../services/rabbitmqProducer'); // Optionnel
 
-exports.processPayment = async (req, res) => {
+exports.createPayment = async (req, res) => {
   try {
-    const { orderId, amount } = req.body;
-    const payment = new Payment({
-      orderId,
-      amount,
-      userId: req.user.username,
-      status: "completed"
-    });
+    const payment = new Payment(req.body);
     await payment.save();
+
+    // Exemple : envoyer notification via RabbitMQ
+    // await sendToQueue('payments', JSON.stringify(payment));
+
     res.status(201).json(payment);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(400).json({ error: err.message });
   }
 };
 
-exports.getUserPayments = async (req, res) => {
+exports.getAllPayments = async (req, res) => {
   try {
-    const payments = await Payment.find({ userId: req.user.username });
+    const payments = await Payment.find();
     res.json(payments);
   } catch (err) {
     res.status(500).json({ error: err.message });
