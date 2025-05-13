@@ -1,68 +1,152 @@
-TP-MicroServices 
+Voici un **README complet et cohérent** pour ton projet de microservices. Il explique l'architecture, la mise en place, les services, les outils de supervision, et les instructions d'exécution. Tu peux le placer à la racine de ton dépôt (`Tp-Microservices/README.md`).
 
-Ce TP a pour objectif la mise en œuvre d’une architecture distribuée reposant sur les microservices. Chaque microservice est responsable d’un domaine fonctionnel spécifique (utilisateurs, commandes, paiements, notifications), conteneurisé avec Docker, orchestré avec docker-compose, et communique soit de manière synchrone (HTTP REST), soit asynchrone (via RabbitMQ). Un API Gateway centralise les appels clients, applique la logique de routage, et gère l’authentification par JWT. Cette structure reflète une architecture orientée services moderne et modulaire.
+---
 
-L’infrastructure est supervisée avec Prometheus (métriques), Grafana (visualisation), et Loki pour la centralisation des logs. Des endpoints /health permettent de suivre l’état de chaque service. Une base de données (MongoDB ou PostgreSQL) est intégrée pour persister les données utilisateurs et commandes, avec des volumes Docker pour la durabilité. Chaque microservice expose également une documentation OpenAPI générée automatiquement via Swagger, améliorant la compréhension de l’API.
+### 📄 `README.md`
 
-Une chaîne CI/CD complète est mise en place avec GitHub Actions, permettant le linting, les tests, et le déploiement automatisé des images Docker vers Docker Hub. Chaque commit déclenche un pipeline de build/test, renforçant la fiabilité du code. Des tests unitaires et d’intégration assurent la robustesse de chaque composant. Des outils comme jest, mocha ou pytest peuvent être utilisés selon les langages choisis (Node.js, Python, etc.).
+```markdown
+# 🧩 Projet Microservices - Architecture Distribuée avec Monitoring
 
-L’objectif final de ce TP est d’acquérir des compétences complètes en architecture microservices, en DevOps, en supervision temps réel, et en bonnes pratiques professionnelles. Les étudiants apprendront à bâtir un système résilient, scalable, bien documenté, et conforme aux standards industriels modernes, le tout dans un environnement contrôlé et reproductible grâce à Docker et GitHub.
+Ce projet met en œuvre une architecture microservices complète basée sur Node.js, MongoDB, Docker, RabbitMQ, Prometheus, Grafana, et Loki.
 
+---
 
-microservices-tp/
+## ⚙️ Architecture du Projet
+
+```
+
+```
+           ┌────────────┐
+           │ API-Gateway│
+           └────┬───────┘
+                │
+```
+
+┌──────────────────┼────────────────────────────┐
+│                  │                            │
+▼                  ▼                            ▼
+User-Service   Order-Service              Payment-Service
+│              │                            │
+└──────────────┴──────────────┐             │
+▼             ▼
+Notification-Service
+▲
 │
-├── .github/
-│   └── workflows/
-│       └── ci.yml                     # Workflow GitHub Actions : test, build, push Docker
+RabbitMQ (Bus)
+
+```
+
+---
+
+## 📦 Microservices
+
+| Service              | Port   | Description                           |
+|----------------------|--------|---------------------------------------|
+| API Gateway          | 3000   | Point d'entrée unique                 |
+| User Service         | 3001   | Gestion des utilisateurs              |
+| Order Service        | 3002   | Gestion des commandes                 |
+| Payment Service      | 3003   | Traitement des paiements              |
+| Notification Service | 3004   | Notifications via RabbitMQ            |
+| MongoDB              | 27017  | Base de données partagée              |
+| RabbitMQ             | 5672/15672 | File de messages + Interface web |
+| Prometheus           | 9090   | Collecte de métriques                 |
+| Grafana              | 3000   | Visualisation de métriques            |
+| Loki                 | 3100   | Centralisation des logs               |
+
+---
+
+## 📁 Structure du projet
+
+```
+
+Tp-Microservices/
 │
-├── docker-compose.yml                # Orchestration complète (services + observabilité)
-├── .env                              # Variables d’environnement globales
-│
-├── api-gateway/
-│   ├── Dockerfile
-│   ├── index.js
-│   ├── package.json
-│   ├── src/
-│   │   ├── routes.js
-│   │   └── authMiddleware.js         # JWT middleware
-│   └── swagger.json
-│
-├── service-user/
-│   ├── Dockerfile
-│   ├── package.json
-│   ├── index.js
-│   ├── src/
-│   │   ├── userController.js
-│   │   └── db.js                     # Connexion MongoDB/PostgreSQL
-│   ├── tests/
-│   │   └── user.test.js
-│   └── swagger.json
-│
-├── service-order/
-│   └── ... (même structure que service-user)
-├── service-payment/
-│   └── ... (même structure que service-user)
-├── service-notification/
-│   └── ... (même structure que service-user)
-│
-├── prometheus/
-│   └── prometheus.yml
-├── grafana/
-│   ├── dashboards/
-│   │   └── main-dashboard.json
-│   └── provisioning/
-│       └── datasources.yml
-│
-├── loki/
-│   └── loki-config.yml               # Centralisation des logs
-├── logs/
-│   └── promtail-config.yml          # Promtail pour envoyer les logs vers Loki
-│
-├── message-broker/
-│   └── docker-compose.rabbitmq.yml
-│
-├── db/
-│   ├── mongo/                        # Ou postgresql/
-│   │   └── docker-compose.db.yml
-│
-└── README.md                         # Documentation complète du projet
+├── api-gateway/                 → Passerelle d'entrée
+├── user-service/                → Microservice utilisateur
+├── order-service/               → Microservice commandes
+├── payment-service/             → Microservice paiements
+├── notification-service/        → Notifications asynchrones
+├── rabbitmq/                    → Définition des files et exchanges
+├── monitoring/
+│   ├── prometheus/              → Config Prometheus
+│   ├── grafana/                 → Dashboards et datasources
+│   └── loki/                    → Config Loki
+├── .env.example                 → Variables d’environnement
+├── docker-compose.yml          → Orchestration des services
+└── init.sh                     → Script de démarrage
+
+````
+
+---
+
+## 🚀 Mise en place du projet
+
+### 1. Copier les variables d’environnement
+
+```bash
+cp .env.example .env
+````
+
+### 2. Lancer l'infrastructure
+
+```bash
+chmod +x init.sh
+./init.sh
+```
+
+Cela effectue :
+
+* un `docker-compose down -v` propre,
+* une reconstruction des images,
+* le démarrage complet avec `docker-compose up -d`,
+* suivi des logs live.
+
+---
+
+## 📊 Monitoring & Observabilité
+
+| Outil       | URL                                              | Identifiants par défaut |
+| ----------- | ------------------------------------------------ | ----------------------- |
+| Grafana     | [http://localhost:3000](http://localhost:3000)   | admin / admin           |
+| Prometheus  | [http://localhost:9090](http://localhost:9090)   | -                       |
+| RabbitMQ UI | [http://localhost:15672](http://localhost:15672) | admin / admin           |
+
+* Dashboards Grafana : metrics de disponibilité des services
+* Prometheus : scrute chaque service via `/metrics`
+* Loki (optionnel) : collecte centralisée des logs applicatifs
+
+---
+
+## 📝 Fonctionnalités clés
+
+* Architecture **modulaire** avec services découplés
+* Communication **synchrones (REST)** et **asynchrones (RabbitMQ)**
+* Supervision complète : **Prometheus**, **Grafana**, **Loki**
+* **Dockerisé** pour une exécution simple et isolée
+* Authentification JWT via l’API Gateway (optionnelle)
+
+---
+
+## 🛠️ À venir / Idées d'amélioration
+
+* Intégration CI/CD avec GitHub Actions
+* Instrumentation fine des services avec `/metrics`
+* Ajout d’un service `frontend` (React, Vue, etc.)
+* Envoi réel d’e-mails ou SMS via Notification Service
+
+---
+
+## 👨‍💻 Auteur
+
+> Réalisé dans le cadre d’un TP d’architecture microservices avec supervision.
+> Par : *Ton Nom / Étudiant en Génie Logiciel*
+
+---
+
+```
+
+Souhaites-tu maintenant :
+- que je te génère une **archive `.zip`** prête à télécharger avec tous les fichiers ?
+- ou une **image illustrée de l'architecture** (type schéma technique) ?
+```
+
