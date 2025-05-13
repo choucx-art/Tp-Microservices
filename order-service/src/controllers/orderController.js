@@ -1,24 +1,29 @@
-const Order = require('../models/Order');
+const Order = require('../models/orderModel');
 
 exports.createOrder = async (req, res) => {
   try {
-    const { items, total } = req.body;
-    const newOrder = new Order({
-      userId: req.user.username,
-      items,
-      total
-    });
-    await newOrder.save();
-    res.status(201).json(newOrder);
+    const order = new Order(req.body);
+    await order.save();
+    res.status(201).json(order);
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+};
+
+exports.getAllOrders = async (req, res) => {
+  try {
+    const orders = await Order.find();
+    res.json(orders);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 };
 
-exports.getUserOrders = async (req, res) => {
+exports.getOrderById = async (req, res) => {
   try {
-    const orders = await Order.find({ userId: req.user.username });
-    res.json(orders);
+    const order = await Order.findById(req.params.id);
+    if (!order) return res.status(404).json({ message: 'Order not found' });
+    res.json(order);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
