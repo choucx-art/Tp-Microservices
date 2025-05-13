@@ -1,1 +1,13 @@
+services:
+  - route: /users
+    target: http://user-service:3001
+  - route: /orders
+    target: http://order-service:3002
+  - route: /payments
+    target: http://payment-service:3003
+  - route: /notifications
+    target: http://notification-service:3004
 
+protected:
+  - /orders
+  - /payments
