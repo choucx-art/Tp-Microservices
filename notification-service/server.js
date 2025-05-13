@@ -1,15 +1,17 @@
 const express = require('express');
 const dotenv = require('dotenv');
-const { consumeNotifications } = require('./src/consumers/notificationConsumer');
+const startConsumer = require('./src/services/rabbitmqConsumer');
 
 dotenv.config();
+
 const app = express();
+const PORT = process.env.NOTIFICATION_SERVICE_PORT || 3004;
 
 app.get('/', (req, res) => {
-  res.send('Notification service is running');
+  res.send('Notification Service is running');
 });
 
-app.listen(process.env.PORT, () => {
-  console.log(`Notification service running on port ${process.env.PORT}`);
-  consumeNotifications(); // start consuming messages
+app.listen(PORT, () => {
+  console.log(`Notification service running on port ${PORT}`);
+  startConsumer(); // Start listening to RabbitMQ
 });
